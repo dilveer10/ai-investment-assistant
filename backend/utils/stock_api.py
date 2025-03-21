@@ -10,6 +10,26 @@ def get_stock_data(symbol):
         "symbol": symbol,
         "apikey": API_KEY
     }
+
+
     response = requests.get(BASE_URL, params=params)
     data = response.json()
-    return data
+
+    try:
+        raw_prices = data["Time Series (Daily)"]
+        clean_data =[]
+
+        for date, values in list(raw_prices.items())[:10]:
+            close_price = values["4. close"]
+            clean_data.append({
+                "date": date,
+                "close": float(close_price)
+            })
+
+        return {"symbol": symbol.upper(), "prices": clean_data}
+    
+    except KeyError:
+        return {"error": "Invalid symbol or API LIMIT HAS BEEN REACHED"}
+    
+
+    
