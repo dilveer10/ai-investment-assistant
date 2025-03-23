@@ -6,6 +6,8 @@ function App() {
   const [symbol, setSymbol] = useState('');
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [trend, setTrend] = useState(null);
+
 
   const fetchStockData = async () => {
     setLoading(true);
@@ -15,6 +17,7 @@ function App() {
         // Reverse data so the latest day is on the right
         const sorted = [...response.data.prices].reverse();
         setData(sorted);
+        setTrend(response.data.trend);
       } else {
         alert('Invalid symbol or no data found.');
       }
@@ -40,6 +43,24 @@ function App() {
       </button>
 
       {loading && <p>Loading...</p>}
+
+      {trend && (
+        <div style={{
+          marginTop: '1rem',
+          padding: '0.75rem 1rem',
+          borderRadius: '10px',
+          display: 'inline-block',
+          backgroundColor: trend === 'uptrend' ? '#d4edda' :
+                          trend === 'downtrend' ? '#f8d7da' :
+                          '#e2e3e5',
+          color: trend === 'uptrend' ? '#155724' :
+                trend === 'downtrend' ? '#721c24' :
+                '#383d41',
+          fontWeight: 'bold'
+        }}>
+          📊 Trend Detected: {trend.toUpperCase()}
+        </div>
+      )}
 
       {data.length > 0 && (
         <ResponsiveContainer width="100%" height={400}>

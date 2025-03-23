@@ -1,7 +1,7 @@
-
 import requests
+from utils.trend_analyzer import detect_trend
 
-API_KEY = "HZU9MHINIZ6URRA1"  # Replace with your actual key
+API_KEY = "YOUR_API_KEY"
 BASE_URL = "https://www.alphavantage.co/query"
 
 def get_stock_data(symbol):
@@ -11,13 +11,12 @@ def get_stock_data(symbol):
         "apikey": API_KEY
     }
 
-
     response = requests.get(BASE_URL, params=params)
     data = response.json()
 
     try:
         raw_prices = data["Time Series (Daily)"]
-        clean_data =[]
+        clean_data = []
 
         for date, values in list(raw_prices.items())[:10]:
             close_price = values["4. close"]
@@ -26,10 +25,13 @@ def get_stock_data(symbol):
                 "close": float(close_price)
             })
 
-        return {"symbol": symbol.upper(), "prices": clean_data}
-    
-    except KeyError:
-        return {"error": "Invalid symbol or API LIMIT HAS BEEN REACHED"}
-    
+        trend = detect_trend(clean_data)  # 🧠 Call AI function here
 
-    
+        return {
+            "symbol": symbol.upper(),
+            "prices": clean_data,
+            "trend": trend  # 👈 Include in the response
+        }
+
+    except KeyError:
+        return {"error": "Invalid symbol or API limit reached"}
